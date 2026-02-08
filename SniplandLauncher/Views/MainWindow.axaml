@@ -1,0 +1,77 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SniplandLauncher.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="SniplandLauncher.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Snipland Launcher"
+        WindowStartupLocation="CenterScreen"
+        Width="900" Height="600">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid>
+        <!-- Background or Theme here -->
+
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" IsVisible="{Binding !IsLoggedIn}">
+            <TextBlock Text="Snipland Launcher" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+            <TextBox Watermark="Email / Login" Text="{Binding Username}" Width="250"/>
+            <TextBox Watermark="Password" PasswordChar="*" Text="{Binding Password}" Width="250"/>
+            <Button Content="Login via Ely.by" Command="{Binding LoginCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+            <TextBlock Text="{Binding StatusText}" HorizontalAlignment="Center" Foreground="Red" FontSize="12"/>
+        </StackPanel>
+
+        <Grid IsVisible="{Binding IsLoggedIn}" ColumnDefinitions="250, *">
+            <!-- Sidebar with modes -->
+            <Border Grid.Column="0" Background="#f0f0f0" BorderBrush="Gray" BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Game Modes" Margin="10" FontWeight="Bold"/>
+                    <ListBox ItemsSource="{Binding Modes}" SelectedItem="{Binding SelectedMode}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="10" Margin="5">
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Version}" FontSize="10" VerticalAlignment="Center" Foreground="Gray"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <!-- Mode Details and Launch -->
+            <Grid Grid.Column="1" RowDefinitions="*, Auto">
+                <StackPanel Grid.Row="0" Margin="20" Spacing="10">
+                    <TextBlock Text="{Binding SelectedMode.Name}" FontSize="32" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding SelectedMode.Description}" TextWrapping="Wrap"/>
+                    <Separator/>
+                    <TextBlock Text="Minecraft Version: " FontWeight="Bold">
+                        <Run Text="{Binding SelectedMode.MinecraftVersion}"/>
+                    </TextBlock>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Margin="20" Spacing="10">
+                    <ProgressBar Value="{Binding Progress}" Maximum="100" Height="20" IsVisible="{Binding IsBusy}"/>
+                    <TextBlock Text="{Binding StatusText}" HorizontalAlignment="Center"/>
+                    <Button Content="PLAY" Command="{Binding LaunchCommand}"
+                            HorizontalAlignment="Stretch" Height="50" FontSize="20" FontWeight="Bold"
+                            HorizontalContentAlignment="Center"
+                            IsEnabled="{Binding !IsBusy}"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <!-- Busy Overlay -->
+        <Border Background="#80000000" IsVisible="{Binding IsBusy}" IsHitTestVisible="True">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                 <TextBlock Text="Please wait..." Foreground="White" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+
+</Window>
