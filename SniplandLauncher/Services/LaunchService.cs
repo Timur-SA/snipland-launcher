@@ -188,8 +188,17 @@ namespace SniplandLauncher.Services
         {
             LogReceived?.Invoke($"Downloading Java {version}...");
 
-            string os = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "windows" : "linux";
-            string arch = "x64";
+            string os = "linux";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) os = "windows";
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) os = "mac";
+
+            string arch = RuntimeInformation.ProcessArchitecture switch
+            {
+                Architecture.X64 => "x64",
+                Architecture.Arm64 => "aarch64",
+                _ => "x64"
+            };
+
             string url = $"https://api.adoptium.net/v3/binary/latest/{version}/ga/{os}/{arch}/jre/hotspot/normal/eclipse";
 
             if (!Directory.Exists(targetDir))
@@ -208,7 +217,7 @@ namespace SniplandLauncher.Services
             LogReceived?.Invoke($"Extracting Java {version}...");
             if (os == "windows")
             {
-                System.IO.Compression.ZipFile.ExtractToDirectory(tempFile, targetDir);
+                System.IO.Compression.ZipFile.ExtractToDirectory(tempFile, targetDir, true);
             }
             else
             {
